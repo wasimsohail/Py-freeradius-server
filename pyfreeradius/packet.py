@@ -38,6 +38,7 @@ class Code(IntEnum):
     ACCESS_REJECT = 3
     ACCOUNTING_REQUEST = 4
     ACCOUNTING_RESPONSE = 5
+    ACCESS_CHALLENGE = 11
     # ... not exhaustive for milestone-1
 
 
