@@ -263,8 +263,9 @@ def create_standard_dictionary() -> Dictionary:
     """
     dictionary = Dictionary()
 
-    # Standard RADIUS attributes from RFC 2865
+    # Standard RADIUS attributes from RFC 2865 and extensions
     standard_attributes = [
+        # RFC 2865 Core Attributes (1-39)
         AttributeDef("User-Name", 1, "string"),
         AttributeDef("User-Password", 2, "string"),
         AttributeDef("CHAP-Password", 3, "octets"),
@@ -281,9 +282,11 @@ def create_standard_dictionary() -> Dictionary:
         AttributeDef("Login-IP-Host", 14, "ipaddr"),
         AttributeDef("Login-Service", 15, "integer"),
         AttributeDef("Login-TCP-Port", 16, "integer"),
+        # Attribute 17 is unassigned
         AttributeDef("Reply-Message", 18, "string"),
         AttributeDef("Callback-Number", 19, "string"),
         AttributeDef("Callback-Id", 20, "string"),
+        # Attribute 21 is unassigned
         AttributeDef("Framed-Route", 22, "string"),
         AttributeDef("Framed-IPX-Network", 23, "ipaddr"),
         AttributeDef("State", 24, "octets"),
@@ -302,6 +305,60 @@ def create_standard_dictionary() -> Dictionary:
         AttributeDef("Framed-AppleTalk-Link", 37, "integer"),
         AttributeDef("Framed-AppleTalk-Network", 38, "integer"),
         AttributeDef("Framed-AppleTalk-Zone", 39, "string"),
+
+                # Accounting attributes (40-49)
+        AttributeDef("Acct-Status-Type", 40, "integer"),
+        AttributeDef("Acct-Delay-Time", 41, "integer"),
+        AttributeDef("Acct-Input-Octets", 42, "integer"),
+        AttributeDef("Acct-Output-Octets", 43, "integer"),
+        AttributeDef("Acct-Session-Id", 44, "string"),
+        AttributeDef("Acct-Authentic", 45, "integer"),
+        AttributeDef("Acct-Session-Time", 46, "integer"),
+        AttributeDef("Acct-Input-Packets", 47, "integer"),
+        AttributeDef("Acct-Output-Packets", 48, "integer"),
+        AttributeDef("Acct-Terminate-Cause", 49, "integer"),
+        AttributeDef("Acct-Multi-Session-Id", 50, "string"),
+        AttributeDef("Acct-Link-Count", 51, "integer"),
+
+        # Common vendor attributes and extensions (55, 60-85)
+        AttributeDef("Event-Timestamp", 55, "integer"),
+        AttributeDef("CHAP-Challenge", 60, "octets"),
+        AttributeDef("NAS-Port-Type", 61, "integer"),
+        AttributeDef("Port-Limit", 62, "integer"),
+        AttributeDef("Login-LAT-Port", 63, "string"),
+        AttributeDef("Tunnel-Type", 64, "integer"),
+        AttributeDef("Tunnel-Medium-Type", 65, "integer"),
+        AttributeDef("Tunnel-Client-Endpoint", 66, "string"),
+        AttributeDef("Tunnel-Server-Endpoint", 67, "string"),
+        AttributeDef("Acct-Tunnel-Connection", 68, "string"),
+        AttributeDef("Tunnel-Password", 69, "string"),
+        AttributeDef("ARAP-Password", 70, "octets"),
+        AttributeDef("ARAP-Features", 71, "octets"),
+        AttributeDef("ARAP-Zone-Access", 72, "integer"),
+        AttributeDef("ARAP-Security", 73, "integer"),
+        AttributeDef("ARAP-Security-Data", 74, "string"),
+        AttributeDef("Password-Retry", 75, "integer"),
+        AttributeDef("Prompt", 76, "integer"),
+        AttributeDef("Connect-Info", 77, "string"),
+        AttributeDef("Configuration-Token", 78, "string"),
+        AttributeDef("EAP-Message", 79, "octets"),
+        AttributeDef("Message-Authenticator", 80, "octets"),
+        AttributeDef("Tunnel-Private-Group-Id", 81, "string"),
+        AttributeDef("Tunnel-Assignment-Id", 82, "string"),
+        AttributeDef("Tunnel-Preference", 83, "integer"),
+                AttributeDef("ARAP-Challenge-Response", 84, "octets"),
+        AttributeDef("Acct-Interim-Interval", 85, "integer"),
+
+        # Additional common attributes
+        AttributeDef("NAS-Port-Id", 87, "string"),
+        AttributeDef("Framed-Pool", 88, "string"),
+        AttributeDef("Chargeable-User-Identity", 89, "string"),
+        AttributeDef("NAS-IPv6-Address", 95, "octets"),
+        AttributeDef("Framed-Interface-Id", 96, "octets"),
+        AttributeDef("Framed-IPv6-Prefix", 97, "octets"),
+        AttributeDef("Login-IPv6-Host", 98, "octets"),
+        AttributeDef("Framed-IPv6-Route", 99, "string"),
+        AttributeDef("Framed-IPv6-Pool", 100, "string"),
     ]
 
     for attr_def in standard_attributes:
