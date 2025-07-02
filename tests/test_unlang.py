@@ -1,7 +1,7 @@
 import pytest
-from pyfreeradius.unlang import parse_policy, evaluate_policy, ResultCode
-from pyfreeradius.unlang.interpreter import RequestContext
-from pyfreeradius.unlang.ast import *
+from pyfreeradius.unlang.ast import ResultCode, Policy, IfStatement, BinaryOp, AcceptStatement, ModuleCall, AttributeRef, StringLiteral, NumberLiteral
+from pyfreeradius.unlang.interpreter import RequestContext, evaluate_policy
+from pyfreeradius.unlang.parser import parse_policy
 
 
 class TestUnlangParser:
@@ -17,6 +17,7 @@ class TestUnlangParser:
         policy = parse_policy("reject")
         assert isinstance(policy, Policy)
         assert len(policy.statements) == 1
+        from pyfreeradius.unlang.ast import RejectStatement
         assert isinstance(policy.statements[0], RejectStatement)
 
     def test_if_statement(self):
@@ -52,6 +53,7 @@ class TestUnlangParser:
     def test_attribute_reference(self):
         policy = parse_policy('if (&request:User-Name) accept')
         if_stmt = policy.statements[0]
+        assert isinstance(if_stmt, IfStatement)
         attr_ref = if_stmt.condition
         assert isinstance(attr_ref, AttributeRef)
         assert attr_ref.path == ["request", "User-Name"]
@@ -59,6 +61,7 @@ class TestUnlangParser:
     def test_string_literal(self):
         policy = parse_policy('if ("test" == "test") accept')
         if_stmt = policy.statements[0]
+        assert isinstance(if_stmt, IfStatement)
         binary_op = if_stmt.condition
         assert isinstance(binary_op, BinaryOp)
         assert isinstance(binary_op.left, StringLiteral)
@@ -67,6 +70,7 @@ class TestUnlangParser:
     def test_number_literal(self):
         policy = parse_policy('if (42 == 42) accept')
         if_stmt = policy.statements[0]
+        assert isinstance(if_stmt, IfStatement)
         binary_op = if_stmt.condition
         assert isinstance(binary_op, BinaryOp)
         assert isinstance(binary_op.left, NumberLiteral)
@@ -75,6 +79,7 @@ class TestUnlangParser:
     def test_complex_expression(self):
         policy = parse_policy('if (&request:User-Name == "alice" && &request:NAS-IP-Address) accept')
         if_stmt = policy.statements[0]
+        assert isinstance(if_stmt, IfStatement)
         and_expr = if_stmt.condition
         assert isinstance(and_expr, BinaryOp)
         assert and_expr.operator == "&&"
