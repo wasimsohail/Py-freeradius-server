@@ -504,7 +504,7 @@ class TestCreateSimpleServer:
                 clients=clients
             )
 
-                        assert server.config.bind_address == "192.168.1.1"
+            assert server.config.bind_address == "192.168.1.1"
             assert server.config.bind_port == 1813
 
             # Check clients were added

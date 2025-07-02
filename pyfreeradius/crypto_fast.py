@@ -48,7 +48,7 @@ class FastCrypto:
         self._buffer_pool = {}
         self._hash_pool = {}
 
-        def get_md5_hasher(self):
+    def get_md5_hasher(self):
         """
         Get a reusable MD5 hasher object for performance.
 

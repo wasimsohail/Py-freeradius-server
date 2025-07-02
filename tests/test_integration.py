@@ -212,8 +212,8 @@ class TestSystemIntegration:
             assert response.code == Code.ACCESS_ACCEPT
             assert response.identifier == 400 + i
 
-                         reply_message = response.get_attribute(18)
-             assert reply_message is not None and f"Welcome {username}" in str(reply_message)
+            reply_message = response.get_attribute(18)
+            assert reply_message is not None and f"Welcome {username}" in str(reply_message)
 
         # Verify final statistics
         stats = server.get_stats()
