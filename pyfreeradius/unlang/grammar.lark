@@ -1,0 +1,100 @@
+// Unlang Grammar - Iteration 1
+// Supports: expressions, if/elsif/else, switch/case, basic attribute operations, module calls
+
+?start: policy
+
+policy: statement*
+
+?statement: if_stmt
+          | switch_stmt
+          | update_stmt
+          | module_call
+          | assignment
+          | return_stmt
+          | accept_stmt
+          | reject_stmt
+          | "{" statement* "}"
+
+// Control flow
+if_stmt: "if" "(" expression ")" statement ("elsif" "(" expression ")" statement)* ("else" statement)?
+
+switch_stmt: "switch" "(" expression ")" "{" case_stmt* default_stmt? "}"
+case_stmt: "case" expression ":" statement*
+default_stmt: "default" ":" statement*
+
+// Actions
+return_stmt: "return"
+accept_stmt: "accept"
+reject_stmt: "reject"
+
+// Module calls
+module_call: IDENTIFIER
+
+// Attribute operations
+update_stmt: "update" attribute_list "{" update_item* "}"
+attribute_list: IDENTIFIER
+
+update_item: attribute_ref update_op expression
+
+assignment: attribute_ref assign_op expression
+
+?update_op: ":=" | "=" | "+=" | "-=" | "!*"
+?assign_op: ":=" | "="
+
+// Expressions
+?expression: or_expr
+
+?or_expr: and_expr
+        | or_expr "||" and_expr
+
+?and_expr: equality_expr
+         | and_expr "&&" equality_expr
+
+?equality_expr: relational_expr
+              | equality_expr "==" relational_expr
+              | equality_expr "!=" relational_expr
+              | equality_expr "=~" relational_expr
+              | equality_expr "!~" relational_expr
+
+?relational_expr: additive_expr
+                | relational_expr "<" additive_expr
+                | relational_expr ">" additive_expr
+                | relational_expr "<=" additive_expr
+                | relational_expr ">=" additive_expr
+
+?additive_expr: multiplicative_expr
+              | additive_expr "+" multiplicative_expr
+              | additive_expr "-" multiplicative_expr
+
+?multiplicative_expr: unary_expr
+                    | multiplicative_expr "*" unary_expr
+                    | multiplicative_expr "/" unary_expr
+                    | multiplicative_expr "%" unary_expr
+
+?unary_expr: primary_expr
+           | "!" unary_expr
+           | "-" unary_expr
+
+?primary_expr: attribute_ref
+             | string_literal
+             | number_literal
+             | "(" expression ")"
+
+// Attribute references
+attribute_ref: "&" attribute_path
+attribute_path: IDENTIFIER (":" IDENTIFIER)*
+
+// Literals
+string_literal: ESCAPED_STRING
+number_literal: NUMBER
+
+// Tokens
+IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_-]*/
+NUMBER: /\d+/
+ESCAPED_STRING: /"(?:[^"\\]|\\.)*"/
+
+// Whitespace and comments
+%import common.WS
+%ignore WS
+COMMENT: /#[^\n]*/
+%ignore COMMENT
