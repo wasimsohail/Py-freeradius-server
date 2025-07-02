@@ -169,9 +169,9 @@ class HighPerformanceServer:
     def _load_dictionaries(self):
         """Load RADIUS dictionaries with optimized parsing."""
         try:
-            # Load main dictionary
-            self.dictionary.load_file("dictionary.main")
-            self.logger.info(f"Loaded {len(self.dictionary.attributes)} attributes")
+            # Dictionary is already initialized with standard attributes
+            all_attrs = self.dictionary.get_all_attributes()
+            self.logger.info(f"Loaded {len(all_attrs)} attributes")
         except Exception as e:
             self.logger.error(f"Failed to load dictionaries: {e}")
 

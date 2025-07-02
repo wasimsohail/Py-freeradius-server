@@ -30,7 +30,7 @@ logger = logging.getLogger("pyfreeradius.server")
 # Helper – compute response authenticator
 # ---------------------------------------------------------------------------
 
-PacketValue = Union[str, int, bytes, ipaddress.IPv4Address, ipaddress.IPv6Address]
+PacketValue = Union[str, int, bytes, ipaddress.IPv4Address]
 
 def build_response_packet(
     request: Packet,
@@ -43,16 +43,13 @@ def build_response_packet(
     if attributes is None:
         attributes = []
     reply = Packet(reply_code, request.identifier, authenticator=b"\x00" * 16)
-    reply.attributes.extend(attributes)  # type: ignore[arg-type]
 
-    # Build attribute bytes first
-    attr_bytes = b"".join(reply._encode_attr(code, value, dictionary) for code, value in reply.attributes)
-    length = Packet._HEADER_STRUCT.size + len(attr_bytes)
-    # Header for hash uses RequestAuth
-    pseudo_header = Packet._HEADER_STRUCT.pack(reply_code, request.identifier, length, request.authenticator)
-    response_auth = hashlib.md5(pseudo_header + attr_bytes + secret).digest()
-    final_header = Packet._HEADER_STRUCT.pack(reply_code, request.identifier, length, response_auth)
-    return final_header + attr_bytes
+    # Add attributes to the reply packet
+    for attr_type, value in attributes:
+        reply.add_attribute(attr_type, value, dictionary)
+
+    # Use the packet's encode method to create the response
+    return reply.encode(secret, dictionary, request.authenticator)
 
 
 # ---------------------------------------------------------------------------
