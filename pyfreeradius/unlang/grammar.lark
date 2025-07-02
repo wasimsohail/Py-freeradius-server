@@ -13,7 +13,9 @@ policy: statement*
           | return_stmt
           | accept_stmt
           | reject_stmt
-          | "{" statement* "}"
+          | block_stmt
+
+block_stmt: "{" statement* "}"
 
 // Control flow
 if_stmt: "if" "(" expression ")" statement ("elsif" "(" expression ")" statement)* ("else" statement)?
@@ -38,42 +40,42 @@ update_item: attribute_ref update_op expression
 
 assignment: attribute_ref assign_op expression
 
-?update_op: ":=" | "=" | "+=" | "-=" | "!*"
-?assign_op: ":=" | "="
+update_op: ":=" | "=" | "+=" | "-=" | "!*"
+assign_op: ":=" | "="
 
 // Expressions
 ?expression: or_expr
 
-?or_expr: and_expr
-        | or_expr "||" and_expr
+or_expr: and_expr
+        | or_expr "||" and_expr  -> or_op
 
-?and_expr: equality_expr
-         | and_expr "&&" equality_expr
+and_expr: equality_expr
+        | and_expr "&&" equality_expr  -> and_op
 
-?equality_expr: relational_expr
-              | equality_expr "==" relational_expr
-              | equality_expr "!=" relational_expr
-              | equality_expr "=~" relational_expr
-              | equality_expr "!~" relational_expr
+equality_expr: relational_expr
+              | equality_expr "==" relational_expr   -> eq_op
+              | equality_expr "!=" relational_expr   -> ne_op
+              | equality_expr "=~" relational_expr   -> match_op
+              | equality_expr "!~" relational_expr   -> nomatch_op
 
-?relational_expr: additive_expr
-                | relational_expr "<" additive_expr
-                | relational_expr ">" additive_expr
-                | relational_expr "<=" additive_expr
-                | relational_expr ">=" additive_expr
+relational_expr: additive_expr
+               | relational_expr "<" additive_expr   -> lt_op
+               | relational_expr ">" additive_expr   -> gt_op
+               | relational_expr "<=" additive_expr  -> le_op
+               | relational_expr ">=" additive_expr  -> ge_op
 
-?additive_expr: multiplicative_expr
-              | additive_expr "+" multiplicative_expr
-              | additive_expr "-" multiplicative_expr
+additive_expr: multiplicative_expr
+             | additive_expr "+" multiplicative_expr -> add_op
+             | additive_expr "-" multiplicative_expr -> sub_op
 
-?multiplicative_expr: unary_expr
-                    | multiplicative_expr "*" unary_expr
-                    | multiplicative_expr "/" unary_expr
-                    | multiplicative_expr "%" unary_expr
+multiplicative_expr: unary_expr
+                   | multiplicative_expr "*" unary_expr -> mul_op
+                   | multiplicative_expr "/" unary_expr -> div_op
+                   | multiplicative_expr "%" unary_expr -> mod_op
 
-?unary_expr: primary_expr
-           | "!" unary_expr
-           | "-" unary_expr
+unary_expr: primary_expr
+          | "!" unary_expr  -> not_op
+          | "-" unary_expr  -> neg_op
 
 ?primary_expr: attribute_ref
              | string_literal

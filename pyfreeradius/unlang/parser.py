@@ -63,17 +63,37 @@ class UnlangTransformer(Transformer):
         return DefaultStatement(items)
 
     def update_stmt(self, items):
-        attr_list = items[0]
+        attr_list = str(items[0])  # Convert to string
         update_items = items[1:]
         return UpdateStatement(attr_list, update_items)
 
     def update_item(self, items):
-        attr_ref, op, value = items
-        return UpdateItem(attr_ref, str(op), value)
+        attr_ref = items[0]
+        op = items[1]  # Now this will be the result of update_op transformer
+        value = items[2]
+        return UpdateItem(attr_ref, op, value)
 
     def assignment(self, items):
-        attr_ref, op, value = items
-        return Assignment(attr_ref, str(op), value)
+        attr_ref = items[0]
+        op = items[1]  # Now this will be the result of assign_op transformer
+        value = items[2]
+        return Assignment(attr_ref, op, value)
+
+    def attribute_list(self, items):
+        return str(items[0])
+
+    def update_op(self, items):
+        # Handle the case where the operator rule has no children
+        # This happens when the grammar uses literal strings
+        if not items:
+            return ":="  # Default operator for update
+        return str(items[0])
+
+    def assign_op(self, items):
+        # Handle the case where the operator rule has no children
+        if not items:
+            return ":="  # Default operator for assignment
+        return str(items[0])
 
     def module_call(self, items):
         return ModuleCall(str(items[0]))
@@ -87,61 +107,109 @@ class UnlangTransformer(Transformer):
     def reject_stmt(self, items):
         return RejectStatement()
 
+    def block_stmt(self, items):
+        return BlockStatement(items)
+
     def or_expr(self, items):
         if len(items) == 1:
             return items[0]
-        return BinaryOp(items[0], "||", items[1])
+        else:
+            # This shouldn't be called with the new named rules
+            return items[0]
 
     def and_expr(self, items):
         if len(items) == 1:
             return items[0]
+        else:
+            # This shouldn't be called with the new named rules
+            return items[0]
+
+    def or_op(self, items):
+        return BinaryOp(items[0], "||", items[1])
+
+    def and_op(self, items):
         return BinaryOp(items[0], "&&", items[1])
 
     def equality_expr(self, items):
         if len(items) == 1:
             return items[0]
-        # Handle left-associative binary operations
-        result = items[0]
-        for i in range(1, len(items), 2):
-            op = str(items[i])
-            right = items[i + 1]
-            result = BinaryOp(result, op, right)
-        return result
+        else:
+            # This shouldn't be called with the new named rules
+            return items[0]
 
     def relational_expr(self, items):
         if len(items) == 1:
             return items[0]
-        result = items[0]
-        for i in range(1, len(items), 2):
-            op = str(items[i])
-            right = items[i + 1]
-            result = BinaryOp(result, op, right)
-        return result
+        else:
+            # This shouldn't be called with the new named rules
+            return items[0]
 
     def additive_expr(self, items):
         if len(items) == 1:
             return items[0]
-        result = items[0]
-        for i in range(1, len(items), 2):
-            op = str(items[i])
-            right = items[i + 1]
-            result = BinaryOp(result, op, right)
-        return result
+        else:
+            # This shouldn't be called with the new named rules
+            return items[0]
 
     def multiplicative_expr(self, items):
         if len(items) == 1:
             return items[0]
-        result = items[0]
-        for i in range(1, len(items), 2):
-            op = str(items[i])
-            right = items[i + 1]
-            result = BinaryOp(result, op, right)
-        return result
+        else:
+            # This shouldn't be called with the new named rules
+            return items[0]
+
+    # Binary operation handlers for named rules
+    def eq_op(self, items):
+        return BinaryOp(items[0], "==", items[1])
+
+    def ne_op(self, items):
+        return BinaryOp(items[0], "!=", items[1])
+
+    def match_op(self, items):
+        return BinaryOp(items[0], "=~", items[1])
+
+    def nomatch_op(self, items):
+        return BinaryOp(items[0], "!~", items[1])
+
+    def lt_op(self, items):
+        return BinaryOp(items[0], "<", items[1])
+
+    def gt_op(self, items):
+        return BinaryOp(items[0], ">", items[1])
+
+    def le_op(self, items):
+        return BinaryOp(items[0], "<=", items[1])
+
+    def ge_op(self, items):
+        return BinaryOp(items[0], ">=", items[1])
+
+    def add_op(self, items):
+        return BinaryOp(items[0], "+", items[1])
+
+    def sub_op(self, items):
+        return BinaryOp(items[0], "-", items[1])
+
+    def mul_op(self, items):
+        return BinaryOp(items[0], "*", items[1])
+
+    def div_op(self, items):
+        return BinaryOp(items[0], "/", items[1])
+
+    def mod_op(self, items):
+        return BinaryOp(items[0], "%", items[1])
 
     def unary_expr(self, items):
         if len(items) == 1:
             return items[0]
-        return UnaryOp(str(items[0]), items[1])
+        else:
+            # This shouldn't be called with the new named rules
+            return items[0]
+
+    def not_op(self, items):
+        return UnaryOp("!", items[0])
+
+    def neg_op(self, items):
+        return UnaryOp("-", items[0])
 
     def attribute_ref(self, items):
         path = items[0]

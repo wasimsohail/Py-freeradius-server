@@ -131,7 +131,12 @@ class UnlangInterpreter:
         """Execute update statement."""
         for item in node.items:
             value = self.evaluate_expression(item.value)
-            self.context.set_attribute(item.attr_ref.path, value, item.operator)
+            # For update statements, if the attribute path doesn't include a list name,
+            # prepend the update statement's attribute list
+            attr_path = item.attr_ref.path
+            if len(attr_path) == 1:
+                attr_path = [node.attribute_list] + attr_path
+            self.context.set_attribute(attr_path, value, item.operator)
         return ResultCode.OK
 
     def visit_Assignment(self, node: Assignment) -> ResultCode:
