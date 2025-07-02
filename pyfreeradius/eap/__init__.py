@@ -34,6 +34,8 @@ class EAPType(IntEnum):
     NOTIFICATION = 2
     NAK = 3
     TLS = 13  # RFC 5216
+    TTLS = 21  # RFC 5281
+    PEAP = 25  # draft-josefsson-pppext-eap-tls-eap-06
 
 
 HEADER_LEN = 4  # Code (1) + Identifier (1) + Length (2)
