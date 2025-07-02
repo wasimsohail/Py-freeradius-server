@@ -30,14 +30,26 @@ from collections import defaultdict
 import weakref
 
 # Import core components
-from ..packet import RadiusPacket, Code
+from ..packet import Packet as RadiusPacket, Code
 from ..dictionary import Dictionary
-from .pap import authenticate_pap
-from .chap import authenticate_chap
-from .mschap import authenticate_mschap
-from .config import ServerConfig
+from .mschap import nt_password_hash, verify_ms_chap_v2
 from ..unlang.interpreter import RequestContext, evaluate_policy
 from ..unlang.parser import parse_policy
+
+# Simple ServerConfig class for compatibility
+class ServerConfig:
+    """Simple server configuration class."""
+    def __init__(self):
+        self.clients = {
+            "127.0.0.1": {
+                "secret": b"testing123",
+                "name": "localhost"
+            }
+        }
+
+    def get_client(self, ip: str):
+        """Get client configuration by IP."""
+        return self.clients.get(ip)
 
 # Try to import fast implementations
 try:

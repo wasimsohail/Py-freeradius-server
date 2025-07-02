@@ -23,12 +23,20 @@ from setuptools import setup, find_packages, Extension
 from pathlib import Path
 
 # Try to import Cython
+CYTHON_AVAILABLE = False
+
 try:
     from Cython.Build import cythonize
     from Cython.Distutils import build_ext
     CYTHON_AVAILABLE = True
 except ImportError:
-    CYTHON_AVAILABLE = False
+    # Create dummy functions for when Cython is not available
+    def cythonize(extensions):
+        return []
+
+    # Use standard build_ext if Cython not available
+    from distutils.command.build_ext import build_ext
+
     print("Warning: Cython not available. Performance extensions will not be built.")
     print("Install Cython with: pip install cython")
 

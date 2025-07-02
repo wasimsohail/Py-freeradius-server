@@ -54,16 +54,18 @@ def extract_ms_chap_attrs(attributes: list[tuple[int, bytes]]) -> Tuple[bytes, b
     return challenge, response
 
 
-def nt_password_hash(password: str) -> bytes:
+def nt_password_hash(password: str) -> str:
     """Generate NT password hash from cleartext password."""
     # Convert password to UTF-16LE and hash with MD4
     password_utf16 = password.encode('utf-16le')
 
     try:
-        return hashlib.new('md4', password_utf16).digest()
+        hash_bytes = hashlib.new('md4', password_utf16).digest()
+        return hash_bytes.hex()
     except (ValueError, OSError):
         # MD4 not available, use fallback
-        return _md4_fallback(password_utf16)
+        hash_bytes = _md4_fallback(password_utf16)
+        return hash_bytes.hex()
 
 
 def lm_password_hash(password: str) -> bytes:
@@ -104,7 +106,8 @@ def verify_ms_chap_v1(challenge: bytes, response: bytes, cleartext_password: str
     nt_response = response[26:50]
 
     # Generate expected NT response
-    nt_hash = nt_password_hash(cleartext_password)
+    nt_hash_hex = nt_password_hash(cleartext_password)
+    nt_hash = bytes.fromhex(nt_hash_hex)
     expected_nt_response = challenge_response(challenge, nt_hash)
 
     # Compare NT response (first 16 bytes)
@@ -135,7 +138,8 @@ def verify_ms_chap_v2(challenge: bytes, response: bytes, cleartext_password: str
     challenge_hash = hashlib.sha1(challenge_hash_input).digest()[:8]
 
     # Generate expected response
-    nt_hash = nt_password_hash(cleartext_password)
+    nt_hash_hex = nt_password_hash(cleartext_password)
+    nt_hash = bytes.fromhex(nt_hash_hex)
     expected_response = challenge_response(challenge_hash, nt_hash)
 
     # Compare responses (first 24 bytes)
